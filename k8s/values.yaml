@@ -54,12 +54,23 @@ routes:
 targets: 
  ROSADEV: 
     profile: ROSADEV
-
   ROSAPRE: 
     profile: ROSAPRE          # Jenkinsfile → deployPre/profile 
-
   ARO: 
     profile: AROPRO           # Jenkinsfile → deployProdA/profile 
-
   ROSA: 
     profile: ROSAPRO          # Jenkinsfile → deployProdRosaA/profile 
+
+# ==== Ejemplo de configuraciones por entorno ====
+#  ROSADEV: 
+#    profile: TEST 
+#    additionalRoutes: 
+#      - name: access-{{project}}-route 
+#        host: {{project}}.itpinero.com 
+#        # Ruta https. 
+#        tls: 
+#          termination: edge 
+#          insecureEdgeTerminationPolicy: Redirect 
+#    additionalEnv: 
+#      - name: ENV_VAR_NAME
+#        value: ENV_VAR_VALUE
