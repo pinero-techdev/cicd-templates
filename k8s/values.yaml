@@ -53,13 +53,13 @@ routes:
 # ================================ 
 targets: 
  ROSADEV: 
-    profile: ROSADEV
-  ROSAPRE: 
-    profile: ROSAPRE          # Jenkinsfile → deployPre/profile 
-  ARO: 
-    profile: AROPRO           # Jenkinsfile → deployProdA/profile 
-  ROSA: 
-    profile: ROSAPRO          # Jenkinsfile → deployProdRosaA/profile 
+   profile: ROSADEV
+ ROSAPRE: 
+   profile: ROSAPRE          # Jenkinsfile → deployPre/profile 
+ ARO: 
+   profile: AROPRO           # Jenkinsfile → deployProdA/profile 
+ ROSA: 
+   profile: ROSAPRO          # Jenkinsfile → deployProdRosaA/profile 
 
 # ==== Ejemplo de configuraciones por entorno ====
 #  ROSADEV: 
