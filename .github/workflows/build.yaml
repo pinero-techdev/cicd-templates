@@ -1,0 +1,13 @@
+name: GP BUILD 
+on: 
+  workflow_dispatch: 
+
+########## Secrets en Origen se facilitan al repo destino ###### 
+jobs: 
+  call-build: 
+    uses: pinero-devops/github-workflows/.github/workflows/gp-build.yaml@master 
+    secrets: 
+      REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }} 
+    with: 
+      BRANCH: ${{ github.ref_name }} 
+      IMAGE_NAME: ${{ github.repository }} 

@@ -1,0 +1,29 @@
+name: GP DEPLOY 
+on: 
+  workflow_dispatch: 
+    inputs: 
+      target: 
+        description: "Target to deploy to (ROSADEV, ROSAPRE, ARO, ROSA)" 
+        required: true 
+        type: choice 
+        options: 
+          - ROSADEV 
+          - ROSAPRE 
+          - ROSA 
+        default: ROSADEV 
+
+########## Secrets en Origen se facilitan al repo destino ###### 
+
+jobs: 
+  call-deploy: 
+    uses: pinero-devops/github-workflows/.github/workflows/gp-deploy.yaml@master 
+    secrets: 
+      REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }} 
+      TEAMS_WEBHOOK_CARD_URL: ${{ secrets.TEAMS_WEBHOOK_CARD_URL }} 
+      REPO_ARGOAPPS_TOKEN: ${{ secrets.REPO_ARGOAPPS_TOKEN }} 
+
+    with: 
+      BRANCH: ${{ github.ref_name }} 
+      IMAGE_NAME: ${{ github.repository }} 
+      TARGET: ${{ github.event.inputs.target }} 
+      VALUES_FILE:  k8s/values.yaml 

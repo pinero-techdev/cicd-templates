@@ -1,0 +1,65 @@
+# ================================ 
+# Identificación de la aplicación 
+# ================================ 
+
+app: <APP_NAME>              # Jenkinsfile → ocpName 
+appType: jetty               # Fijo para servicios Java WAR 
+k8sType: deployment          # Normalmente deployment 
+profile: PROD                # Jenkinsfile → deployProd*.profile 
+namespace: <NAMESPACE>       # Jenkinsfile → ocpGroup / ocpProject 
+
+# ================================ 
+# Build 
+# ================================ 
+
+baseImage: regdev.grupo-pinero.com/gp-jetty11-jdk21:latest    # Se quita para frontales 
+war: <WAR_PATH>               # Jenkinsfile → docker.warSrc 
+target: <TARGET_APP>          # Jenkinsfile → docker.targetApp 
+jdk: <JDK_VERSION>            # Jenkinsfile → docker.jdk 
+
+# ================================ 
+# Probes 
+# ================================ 
+livenessProbe: 
+  httpGet: 
+    path: <LIVENESS_PATH>     # Jenkinsfile → deployment.liveness.path 
+    port: 8080 
+    scheme: HTTP 
+  initialDelaySeconds: 60     # Ajustar según Jenkinsfile 
+  timeoutSeconds: <TIMEOUT>   # Jenkinsfile → deployment.liveness.timeoutSeconds 
+  periodSeconds: <PERIOD>     # Jenkinsfile → deployment.liveness.periodSeconds 
+  successThreshold: 1 
+  failureThreshold: 3 
+
+startupProbe: 
+  httpGet: 
+    path: <STARTUP_PATH>      # Jenkinsfile → deployment.startup.path 
+    port: 8080 
+    scheme: HTTP 
+  initialDelaySeconds: <INITIAL_DELAY>  # Jenkinsfile → deployment.startup.initialDelaySeconds 
+  timeoutSeconds: <TIMEOUT>             # Jenkinsfile → deployment.startup.timeoutSeconds 
+  periodSeconds: <PERIOD>               # Jenkinsfile → deployment.startup.periodSeconds 
+  successThreshold: 1 
+  failureThreshold: <FAILURE_THRESHOLD> # Jenkinsfile → deployment.startup.failureThreshold 
+
+# ================================ 
+# Rutas 
+# ================================ 
+routes: 
+  - default: true             # Jenkinsfile → routes (si necesitas adicionales, se ponen en el siguiente punto) 
+
+# ================================ 
+# Targets / Entornos 
+# ================================ 
+targets: 
+ ROSADEV: 
+    profile: ROSADEV
+
+  ROSAPRE: 
+    profile: ROSAPRE          # Jenkinsfile → deployPre/profile 
+
+  ARO: 
+    profile: AROPRO           # Jenkinsfile → deployProdA/profile 
+
+  ROSA: 
+    profile: ROSAPRO          # Jenkinsfile → deployProdRosaA/profile 
