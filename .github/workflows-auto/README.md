@@ -31,10 +31,9 @@ Este proyecto utiliza GitHub Actions para automatizar el proceso de build y depl
 - Se ejecuta manualmente desde GitHub Actions
 
 **Qué hace:**
-1. Compila el código fuente Java con Maven
-2. Construye la imagen Docker
-3. Publica la imagen en el registry
-4. Al finalizar exitosamente, dispara automáticamente el workflow de DEPLOY
+1. Construye la imagen Docker
+2. Publica la imagen en el registry
+3. Al finalizar exitosamente, dispara automáticamente el workflow de DEPLOY
 
 ### 2. GP DEPLOY (`deploy.yaml`)
 **Propósito:** Desplegar la aplicación en los diferentes entornos
