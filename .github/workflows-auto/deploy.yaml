@@ -1,0 +1,87 @@
+################################################################################
+# Workflow de DEPLOY para gp-api-balancer
+#
+# Propósito:
+#   - Desplegar la aplicación en los diferentes entornos (ROSADEV, ROSAPRE, ROSA)
+#   - Se ejecuta automáticamente después de un build exitoso
+#   - También puede ejecutarse manualmente para elegir el entorno destino
+#
+# Flujo automático por rama:
+#   - test    -> BUILD exitoso -> DEPLOY automático a ROSADEV
+#   - develop -> BUILD exitoso -> DEPLOY automático a ROSAPRE
+#
+# Flujo manual:
+#   - Permite elegir manualmente el entorno (ROSADEV, ROSAPRE, ROSA)
+#
+# Para modificar:
+#   - Agregar nuevos entornos: añadir en 'options' bajo 'target'
+#   - Cambiar mapeo rama->entorno: modificar la expresión en 'TARGET'
+#   - Agregar más ramas automáticas: añadir en 'branches' y en la lógica de TARGET
+################################################################################
+
+name: GP DEPLOY
+
+on:
+  # Trigger automático: se ejecuta cuando el workflow "GP BUILD" finaliza
+  workflow_run:
+    workflows: [ "GP BUILD" ]
+    types: [ completed ]
+    branches:
+      - test      # Build en test -> despliega a ROSADEV
+      - develop   # Build en develop -> despliega a ROSAPRE
+
+  # Trigger manual: permite ejecutar el deploy manualmente
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Target to deploy to (ROSADEV, ROSAPRE, ROSA)"
+        type: choice
+        options:
+          - ROSADEV   # Entorno de desarrollo
+          - ROSAPRE   # Entorno de pre-producción
+          - ROSA      # Entorno de producción
+          # Agregar aquí más entornos si se necesitan
+        default: ROSADEV
+
+jobs:
+  call-deploy:
+    # Solo ejecuta si:
+    # - Es un trigger manual (workflow_dispatch), O
+    # - El workflow de BUILD finalizó con éxito
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    # Llama al workflow reutilizable de deploy centralizado
+    uses: pinero-techdev/cicd-templates/.github/workflows/gp-deploy.yaml@master
+
+    # Secrets necesarios para el proceso de deploy
+    secrets:
+      REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+      TEAMS_WEBHOOK_CARD_URL: ${{ secrets.TEAMS_WEBHOOK_CARD_URL }}
+      REPO_ARGOAPPS_TOKEN: ${{ secrets.REPO_ARGOAPPS_TOKEN }}
+
+    # Parámetros del deploy
+    with:
+      # Rama a desplegar
+      BRANCH: ${{ github.event.workflow_run.head_branch || github.ref_name }}
+
+      # Nombre de la imagen Docker a desplegar
+      IMAGE_NAME: ${{ github.repository }}
+
+      # Entorno destino - Lógica de selección:
+      # 1. Si es trigger automático (workflow_run):
+      #    - Rama 'test' -> ROSADEV
+      #    - Rama 'develop' -> ROSAPRE
+      # 2. Si es trigger manual (workflow_dispatch):
+      #    - Usa el valor seleccionado en 'target'
+      TARGET: ${{ 
+        (github.event_name == 'workflow_run' && 
+          (github.event.workflow_run.head_branch == 'test' && 'ROSADEV' || 
+           github.event.workflow_run.head_branch == 'develop' && 'ROSAPRE')
+        ) || 
+        github.event.inputs.target
+      }}
+
+      # Archivo de configuración de valores para Kubernetes/Helm
+      VALUES_FILE: k8s/values.yaml
