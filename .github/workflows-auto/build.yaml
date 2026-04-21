@@ -1,0 +1,46 @@
+################################################################################
+# Workflow de BUILD para gp-api-balancer
+#
+# Propósito:
+#   - Compilar y construir la imagen Docker del proyecto
+#   - Se ejecuta automáticamente en push a ramas: test, develop
+#   - También puede ejecutarse manualmente desde GitHub Actions
+#
+# Flujo:
+#   1. Se activa por push a las ramas configuradas
+#   2. Compila el código fuente
+#   3. Construye la imagen Docker
+#   4. Publica la imagen en el registry
+#   5. Al finalizar con éxito, dispara automáticamente el workflow de DEPLOY
+#
+# Para modificar:
+#   - Agregar más ramas: añadir en la lista 'branches' bajo 'push'
+#   - Cambiar configuración de build: ver workflow llamado en 'uses'
+################################################################################
+
+name: GP BUILD
+
+on:
+  # Trigger automático: se ejecuta cuando hay un push a estas ramas
+  push:
+    branches:
+      - 'test'      # Rama de testing -> despliega a ROSADEV
+      - 'develop'   # Rama de desarrollo -> despliega a ROSAPRE
+
+  # Trigger manual: permite ejecutar el workflow manualmente desde GitHub
+  workflow_dispatch:
+
+jobs:
+  call-build:
+    # Llama al workflow reutilizable de build centralizado
+    # Este workflow maneja toda la lógica de compilación y publicación
+    uses: pinero-devops/github-workflows/.github/workflows/gp-build.yaml@master
+
+    # Secrets necesarios para el proceso de build
+    secrets:
+      REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+
+    # Parámetros del build
+    with:
+      BRANCH: ${{ github.ref_name }}        # Nombre de la rama actual
+      IMAGE_NAME: ${{ github.repository }}  # Nombre del repositorio (usado para nombrar la imagen)
