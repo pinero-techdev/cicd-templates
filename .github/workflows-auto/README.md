@@ -129,7 +129,7 @@ TARGET: ${{
   (github.event_name == 'workflow_run' && 
     (github.event.workflow_run.head_branch == 'test' && 'ROSADEV' || 
      github.event.workflow_run.head_branch == 'develop' && 'ROSAPRE' ||
-     github.event.workflow_run.head_branch == 'rama-ejemplo' && 'ROSA')    # ← AGREGAR AQUÍ
+     github.event.workflow_run.head_branch == 'rama-ejemplo' && 'cluster-ejemplo')    # ← AGREGAR AQUÍ
   ) || 
   github.event.inputs.target 
 }}
