@@ -53,7 +53,7 @@ jobs:
       github.event.workflow_run.conclusion == 'success'
 
     # Llama al workflow reutilizable de deploy centralizado
-    uses: pinero-techdev/cicd-templates/.github/workflows/gp-deploy.yaml@master
+    uses: pinero-devops/github-workflows/.github/workflows/gp-deploy.yaml@master
 
     # Secrets necesarios para el proceso de deploy
     secrets:
