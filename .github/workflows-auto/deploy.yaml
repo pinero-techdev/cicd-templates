@@ -64,7 +64,7 @@ jobs:
     # Parámetros del deploy
     with:
       # Rama a desplegar
-      BRANCH: ${{ github.event.workflow_run.head_branch || github.ref_name }}
+      BRANCH: ${{ github.event.inputs.target && github.ref_name || github.event.workflow_run.head_branch }}
 
       # Nombre de la imagen Docker a desplegar
       IMAGE_NAME: ${{ github.repository }}
